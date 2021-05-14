@@ -1,12 +1,40 @@
 scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile0`, function (sprite, location) {
-    mySprite.destroy()
+    mySprite.destroy(effects.coolRadial, 500)
+    game.over(false, effects.dissolve)
+})
+scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile`, function (sprite, location) {
+    levels += 1
+    UpdateLevels = true
 })
 controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
     mySprite.vy = -100
 })
+function LevelChange () {
+    if (UpdateLevels) {
+        if (levels == 2) {
+            tiles.setTilemap(tilemap`level3`)
+            tiles.placeOnTile(mySprite, tiles.getTileLocation(0, 6))
+            UpdateLevels = false
+        } else if (levels == 3) {
+            tiles.setTilemap(tilemap`level7`)
+            tiles.placeOnTile(mySprite, tiles.getTileLocation(0, 6))
+            UpdateLevels = false
+        } else if (levels == 4) {
+            tiles.setTilemap(tilemap`level0`)
+            tiles.placeOnTile(mySprite, tiles.getTileLocation(0, 6))
+            UpdateLevels = false
+        } else if (levels == 5) {
+        	
+        }
+    }
+}
 scene.onOverlapTile(SpriteKind.Player, sprites.dungeon.hazardWater, function (sprite, location) {
-    mySprite.destroy()
+    sprite.destroy(effects.confetti, 1000)
+    pause(1000)
+    game.over(false, effects.dissolve)
 })
+let UpdateLevels = false
+let levels = 0
 let mySprite: Sprite = null
 mySprite = sprites.create(img`
     . . . . . . f f f f f f . . . . 
@@ -152,17 +180,9 @@ scene.cameraFollowSprite(mySprite)
 controller.moveSprite(mySprite, 100, 0)
 mySprite.ay = 200
 tiles.setTilemap(tilemap`level1`)
-let levels = 1
-let UpdateLevels = false
+levels = 1
+UpdateLevels = false
+tiles.placeOnTile(mySprite, tiles.getTileLocation(0, 6))
 game.onUpdate(function () {
-    if (UpdateLevels) {
-        if (levels == 1) {
-            tiles.setTilemap(tilemap`level2`)
-            UpdateLevels = false
-        } else if (false) {
-        	
-        } else {
-        	
-        }
-    }
+    LevelChange()
 })
