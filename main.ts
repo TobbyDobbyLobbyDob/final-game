@@ -25,14 +25,14 @@ function LevelChange () {
     if (UpdateLevels) {
         if (levels == 2) {
             tiles.setTilemap(tilemap`level3`)
-            game.splash("Level 2")
+            game.splash("Level 2, careful with those spikes!")
             tiles.placeOnTile(Squirrel, tiles.getTileLocation(12, 6))
             tiles.placeOnTile(Boss, tiles.getTileLocation(48, 6))
             tiles.placeOnTile(mySprite, tiles.getTileLocation(0, 6))
             UpdateLevels = false
         } else if (levels == 3) {
             tiles.setTilemap(tilemap`level7`)
-            game.splash("Level 3")
+            game.splash("Level 3, Those pesky dogs.")
             Dog = sprites.create(img`
                 . . 4 4 4 . . . . 4 4 4 . . . . 
                 . 4 5 5 5 e . . e 5 5 5 4 . . . 
@@ -57,14 +57,14 @@ function LevelChange () {
             UpdateLevels = false
         } else if (levels == 4) {
             tiles.setTilemap(tilemap`level0`)
-            game.splash("Level 4")
+            game.splash("Level 4 Watchout for fake platforms.")
             tiles.placeOnTile(Dog, tiles.getTileLocation(27, 6))
             tiles.placeOnTile(Squirrel, tiles.getTileLocation(21, 6))
             tiles.placeOnTile(mySprite, tiles.getTileLocation(0, 6))
             UpdateLevels = false
         } else if (levels == 5) {
             tiles.setTilemap(tilemap`level14`)
-            game.splash("Level 5")
+            game.splash("Level 5, A big bee wants to sting you")
             Bee = sprites.create(assets.image`Bee`, SpriteKind.Enemy)
             tiles.placeOnTile(Dog, tiles.getTileLocation(11, 6))
             tiles.placeOnTile(Squirrel, tiles.getTileLocation(24, 6))
@@ -74,7 +74,7 @@ function LevelChange () {
             Bee.follow(mySprite)
         } else if (levels == 6) {
             tiles.setTilemap(tilemap`level15`)
-            game.splash("Final Level")
+            game.splash("Final Level, Good Luck")
             Bee.destroy()
             Dog.destroy()
             Squirrel.destroy()
@@ -173,22 +173,28 @@ function LevelChange () {
             if (mySprite.y >= -200) {
                 mySprite.vy = 0
             }
-            info.startCountdown(15)
         }
     }
 }
 function BossFight () {
-    projectile = sprites.createProjectileFromSprite(img`
-        . . c c c c . . 
-        . c b d d d c . 
-        c b d d d d d c 
-        c b b d d d d c 
-        c b d b d d b c 
-        c c b d b b b c 
-        c c c b d d b c 
-        c c b b c c c c 
-        `, Boss, randint(20, scene.screenWidth()), randint(20, scene.screenHeight()))
+    if (levels == 6) {
+        info.startCountdown(15)
+        projectile = sprites.createProjectileFromSprite(img`
+            . . c c c c . . 
+            . c b d d d c . 
+            c b d d d d d c 
+            c b b d d d d c 
+            c b d b d d b c 
+            c c b d b b b c 
+            c c c b d d b c 
+            c c b b c c c c 
+            `, Boss, randint(20, scene.screenWidth()), randint(20, scene.screenHeight()))
+    }
 }
+sprites.onOverlap(SpriteKind.Player, SpriteKind.Projectile, function (sprite, otherSprite) {
+    info.changeLifeBy(-1)
+    tiles.placeOnTile(Boss, tiles.getTileLocation(9.5, 2))
+})
 scene.onOverlapTile(SpriteKind.Player, sprites.dungeon.hazardWater, function (sprite, location) {
     tiles.placeOnTile(sprite, tiles.getTileLocation(0, 5))
     info.changeLifeBy(-1)
@@ -275,7 +281,7 @@ game.setDialogCursor(img`
     . . . . . f f f f f f . . . . . 
     . . . . . f f . . f f . . . . . 
     `)
-game.showLongText("Welcome to The Hunt. An evil Duck has taken your phone while at the park and you have to go through a series of level to get it back. Will you get your phone back, or fail repeatedly until you do?", DialogLayout.Bottom)
+game.showLongText("Welcome to The Hunt. An evil Duck has taken your phone while at the park and you have to go through a series of level to get it back. Will you get your phone back, or fail repeatedly until you do? (Use the arrow keys to move and jump with A, double tap to double jump.", DialogLayout.Bottom)
 game.onUpdate(function () {
     LevelChange()
     if (mySprite.vx > 0) {
@@ -514,4 +520,7 @@ game.onUpdate(function () {
 })
 game.onUpdateInterval(500, function () {
 	
+})
+game.onUpdateInterval(500, function () {
+    BossFight()
 })
